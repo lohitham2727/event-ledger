@@ -3,6 +3,7 @@ package com.event.gateway.service;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
@@ -23,6 +24,9 @@ public class EventService {
             LoggerFactory.getLogger(EventService.class);
 
     private final EventRepository repository;
+    
+    private final AtomicInteger eventCounter =
+            new AtomicInteger();
 
     private final AccountClient accountClient;
     
@@ -58,6 +62,8 @@ public class EventService {
         repository.save(event);
         log.info("Event saved successfully: {}",
                 event.getEventId());
+        
+        eventCounter.incrementAndGet();
 
         TransactionRequest tx =
                 new TransactionRequest();
@@ -77,6 +83,10 @@ public class EventService {
                 request.getAccountId());
 
         return event;
+    }
+    
+    public int getProcessedEventCount() {
+        return eventCounter.get();
     }
 
     public Event getEvent(String id) {

@@ -38,4 +38,8 @@ public class EventController {
 
         return service.getEvents(account);
     }
+    @GetMapping("/metrics/events")
+    public int eventCount() {
+        return service.getProcessedEventCount();
+    }
 }
